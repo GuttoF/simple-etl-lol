@@ -26,22 +26,22 @@ class DatabaseManager:
         """)
 
         self.conn.execute("""
-            CREATE TABLE IF NOT EXISTS matches (
-                match_id VARCHAR,
-                puuid VARCHAR,
-                summoner_name VARCHAR,
-                region VARCHAR,
-                timestamp TIMESTAMP,
-                duration INTEGER,
-                game_mode VARCHAR,
-                win BOOLEAN,
-                kills INTEGER,
-                deaths INTEGER,
-                assists INTEGER,
-                cs INTEGER,
-                gold INTEGER,
-                items VARCHAR,
-                PRIMARY KEY (match_id, puuid)
+        CREATE TABLE IF NOT EXISTS matches (
+            match_id VARCHAR,
+            puuid VARCHAR,
+            player_name VARCHAR,
+            region VARCHAR,
+            timestamp TIMESTAMP,
+            duration INTEGER,
+            game_mode VARCHAR,
+            win BOOLEAN,
+            kills INTEGER,
+            deaths INTEGER,
+            assists INTEGER,
+            cs INTEGER,
+            gold INTEGER,
+            items VARCHAR,
+            PRIMARY KEY (match_id, puuid)
             )
         """)
 
@@ -68,13 +68,15 @@ class DatabaseManager:
             self.conn.execute(
                 """
                 INSERT OR REPLACE INTO matches
-                (match_id, puuid, timestamp, duration, game_mode, win,
+                (match_id, puuid, player_name, region, timestamp, duration, game_mode, win,
                 kills, deaths, assists, cs, gold, items)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,  # noqa: E501
                 (
                     match["match_id"],
                     match["puuid"],
+                    match["player_name"],
+                    match["region"],
                     match["timestamp"],
                     match["duration"],
                     match["game_mode"],

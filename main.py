@@ -43,9 +43,10 @@ async def fetch_and_save_matches(summoner_name: str, region_code: str = "br1") -
                     match_id, BASE_REGIONS[region_code]
                 )
                 processed_data: dict[str, Any] = match_manager.process_match_data(
-                    match, summoner.puuid
+                    match,summoner.puuid, summoner_name, region_code
                 )
                 matches_data.append(processed_data)
+
             except Exception as e:
                 print(f"Error processing match {match_id}: {str(e)}")
                 continue

@@ -28,13 +28,21 @@ class MatchManager:
         except Exception as e:
             raise Exception(f"Failed to get match details for {match_id}: {str(e)}")
 
-    def process_match_data(self, match: Match, puuid: str) -> Dict[str, Any]:
+    def process_match_data(
+        self, match: Match, puuid: str, player_name: str, region: str
+    ) -> Dict[str, Any]:
         try:
             player = next(p for p in match.info.participants if p["puuid"] == puuid)
+
+            # Debug prints
+            print(f"Player Name: {player_name}")
+            print(f"Region: {region}")
 
             return {
                 "match_id": match.metadata.matchId,
                 "puuid": puuid,
+                "player_name": player_name,
+                "region": region,
                 "timestamp": datetime.fromtimestamp(match.info.gameCreation / 1000),
                 "duration": match.info.gameDuration,
                 "game_mode": match.info.gameMode,
