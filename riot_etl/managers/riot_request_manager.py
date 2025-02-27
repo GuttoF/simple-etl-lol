@@ -23,7 +23,9 @@ class RiotRequestManager:
             "Content-Type": "application/json",
         }
 
-    async def get_request(self, url: str, params: Optional[Dict] = None) -> Dict:
+    async def get_request(
+        self, url: str, params: Optional[Dict[str, Any]] = None
+    ) -> Any:
         await self.rate_limiter.wait_if_needed()
 
         async with httpx.AsyncClient() as client:
@@ -36,41 +38,42 @@ class RiotRequestManager:
                     if isinstance(data, dict):
                         print(f"Response data keys: {data.keys()}")
                     elif isinstance(data, list):
-                        print(f"Response data length: {len(data)}")
+                        print(f"Response data length: {len(data)}")  # type: ignore
                     else:
                         print(f"Response data: {data}")
-                    return data
+                    return data  # type: ignore
                 elif response.status_code == 429:
-                    retry_after = int(response.headers.get('Retry-After', 5))
+                    retry_after = int(response.headers.get("Retry-After", 5))
                     print(f"Rate limit exceeded. Waiting {retry_after} seconds...")
                     await asyncio.sleep(retry_after)
                     return await self.get_request(url, params)
                 else:
-                    raise Exception(f"API Error: {response.status_code} - {response.text}")
+                    raise Exception(
+                        f"API Error: {response.status_code} - {response.text}"
+                    )
 
             except httpx.RequestError as e:
                 raise Exception(f"Request failed: {str(e)}")
 
-
-    async def get_summoner_by_name(self, summoner_name: str, region: str, server_code: str) -> SummonerProfile:
+    async def get_summoner_by_name(
+        self, summoner_name: str, region: str, server_code: str
+    ) -> SummonerProfile:
         try:
             account_tagline = summoner_name.replace("#", "/")
-            
+
             url = f"https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{account_tagline}"
             account_data = await self.get_request(url)
-            print(f"Account data: {account_data}")  # Debug print
+            print(f"Account data: {account_data}")
             account_id = SummonerIds(**account_data)
-    
+
             url = f"https://{server_code}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{account_id.puuid}"
             summoner_data = await self.get_request(url)
-            print(f"Summoner data: {summoner_data}")  # Debug print
-            
-            # Adicione o nome do account_id aos dados do invocador
-            summoner_data['name'] = account_id.gameName
-            
+            print(f"Summoner data: {summoner_data}")
+
+            summoner_data["name"] = account_id.gameName
+
             summoner = SummonerProfile(**summoner_data)
             return summoner
-            
+
         except Exception as e:
             raise Exception(f"Failed to get summoner data: {str(e)}")
-

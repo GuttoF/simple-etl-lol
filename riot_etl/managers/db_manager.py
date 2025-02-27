@@ -1,9 +1,9 @@
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, List, Optional
 
 import duckdb
 import pandas as pd
-from pathlib import Path
 
 
 class DatabaseManager:
@@ -29,6 +29,8 @@ class DatabaseManager:
             CREATE TABLE IF NOT EXISTS matches (
                 match_id VARCHAR,
                 puuid VARCHAR,
+                summoner_name VARCHAR,
+                region VARCHAR,
                 timestamp TIMESTAMP,
                 duration INTEGER,
                 game_mode VARCHAR,
@@ -103,7 +105,7 @@ class DatabaseManager:
         self, puuid: Optional[str] = None, filepath: Optional[Path] = None
     ) -> str:
         if filepath is None:
-            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filepath = Path(f"matches_export_{timestamp}.csv")
         else:
             filepath = Path(filepath)
